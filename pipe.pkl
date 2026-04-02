@@ -1,3 +1,4 @@
+# retrain_pipe.py
 import pandas as pd
 import numpy as np
 from sklearn.compose import ColumnTransformer
@@ -6,14 +7,14 @@ from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeRegressor
 import pickle
 
-# Load your dataset
+# Load dataset
 df = pd.read_csv("df.csv")
 
 # Features and target
 X = df[['Company','TypeName','Ram','Weight','Touchscreen','IPS','PPI','Cpu_brand','HDD','SSD','Gpu_brand','os']]
-y = df['Price']
+y = df['Price']  # your target column
 
-# Preprocessor
+# Preprocessing
 preprocessor = ColumnTransformer(
     transformers=[
         ('cat', OneHotEncoder(handle_unknown='ignore'), ['Company','TypeName','Cpu_brand','Gpu_brand','os']),
@@ -30,6 +31,6 @@ pipe = Pipeline([
 # Fit pipeline
 pipe.fit(X, y)
 
-# Save compatible pickle
+# Save pickle in binary mode
 with open("pipe.pkl", "wb") as f:
     pickle.dump(pipe, f)
