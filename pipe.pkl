@@ -6,14 +6,14 @@ from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeRegressor
 import pickle
 
-# Load dataset
+# Load your dataset
 df = pd.read_csv("df.csv")
 
-# Prepare input features and target
+# Features and target
 X = df[['Company','TypeName','Ram','Weight','Touchscreen','IPS','PPI','Cpu_brand','HDD','SSD','Gpu_brand','os']]
-y = df['Price']  # replace with your actual target column
+y = df['Price']
 
-# Create preprocessor
+# Preprocessor
 preprocessor = ColumnTransformer(
     transformers=[
         ('cat', OneHotEncoder(handle_unknown='ignore'), ['Company','TypeName','Cpu_brand','Gpu_brand','os']),
@@ -21,7 +21,7 @@ preprocessor = ColumnTransformer(
     ]
 )
 
-# Create pipeline
+# Pipeline
 pipe = Pipeline([
     ('preprocessor', preprocessor),
     ('model', DecisionTreeRegressor())
@@ -30,5 +30,6 @@ pipe = Pipeline([
 # Fit pipeline
 pipe.fit(X, y)
 
-# Save new pickle compatible with scikit-learn >=1.2
-pickle.dump(pipe, open("pipe.pkl", "wb"))
+# Save compatible pickle
+with open("pipe.pkl", "wb") as f:
+    pickle.dump(pipe, f)
