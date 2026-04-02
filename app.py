@@ -4,13 +4,29 @@ import pickle
 import numpy as np
 import pandas as pd
 
-# Load the model and dataframe
-df = pd.read_csv("df.csv")
-pipe = pickle.load(open("pipe.pkl", "rb"))
+# ------------------------------
+# Load model and dataframe
+# ------------------------------
+try:
+    df = pd.read_csv("df.csv")
+except FileNotFoundError:
+    st.error("❌ df.csv not found! Please upload it to your repo.")
+    st.stop()
+
+try:
+    pipe = pickle.load(open("pipe.pkl", "rb"))
+except FileNotFoundError:
+    st.error("❌ pipe.pkl not found! Please upload it to your repo.")
+    st.stop()
+except Exception as e:
+    st.error(f"❌ Error loading pipe.pkl: {e}")
+    st.stop()
 
 st.title("💻 Laptop Price Predictor")
 
-# --- User Inputs ---
+# ------------------------------
+# User Inputs
+# ------------------------------
 company = st.selectbox('Brand', df['Company'].unique())
 lap_type = st.selectbox("Type", df['TypeName'].unique())
 ram = st.selectbox("RAM (GB)", [2,4,6,8,12,16,24,32,64])
@@ -29,23 +45,27 @@ ssd = st.selectbox('SSD (GB)', [0,8,128,256,512,1024])
 gpu = st.selectbox('GPU', df['Gpu_brand'].unique())
 os = st.selectbox('OS', df['os'].unique())
 
-# --- Prediction ---
+# ------------------------------
+# Prediction
+# ------------------------------
 if st.button('Predict Price'):
-    # Convert Yes/No to 1/0
-    touchscreen_val = 1 if touchscreen == "Yes" else 0
-    ips_val = 1 if ips == "Yes" else 0
+    try:
+        # Convert Yes/No to 1/0
+        touchscreen_val = 1 if touchscreen == "Yes" else 0
+        ips_val = 1 if ips == "Yes" else 0
 
-    # Compute PPI
-    X_res = int(resolution.split('x')[0])
-    Y_res = int(resolution.split('x')[1])
-    ppi = ((X_res ** 2 + Y_res ** 2) ** 0.5) / screen_size
+        # Compute PPI
+        X_res = int(resolution.split('x')[0])
+        Y_res = int(resolution.split('x')[1])
+        ppi = ((X_res ** 2 + Y_res ** 2) ** 0.5) / screen_size
 
-    # Prepare query
-    query = np.array([company, lap_type, ram, weight,
-                      touchscreen_val, ips_val, ppi,
-                      cpu, hdd, ssd, gpu, os]).reshape(1, 12)
+        # Prepare query
+        query = np.array([company, lap_type, ram, weight,
+                          touchscreen_val, ips_val, ppi,
+                          cpu, hdd, ssd, gpu, os]).reshape(1, 12)
 
-    # Predict price
-    price = int(np.exp(pipe.predict(query)[0]))
-
-    st.success(f"💰 Predicted Price: ₹ {price}")
+        # Predict price
+        price = int(np.exp(pipe.predict(query)[0]))
+        st.success(f"💰 Predicted Price: ₹ {price:,}")  # formatted with commas
+    except Exception as e:
+        st.error(f"❌ Prediction failed: {e}")
