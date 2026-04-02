@@ -1,4 +1,3 @@
-# retrain_pipe.py
 import pandas as pd
 import numpy as np
 from sklearn.compose import ColumnTransformer
@@ -10,9 +9,9 @@ import pickle
 # Load dataset
 df = pd.read_csv("df.csv")
 
-# Features and target
+# Features & target
 X = df[['Company','TypeName','Ram','Weight','Touchscreen','IPS','PPI','Cpu_brand','HDD','SSD','Gpu_brand','os']]
-y = df['Price']  # your target column
+y = df['Price']
 
 # Preprocessing
 preprocessor = ColumnTransformer(
@@ -31,6 +30,6 @@ pipe = Pipeline([
 # Fit pipeline
 pipe.fit(X, y)
 
-# Save pickle in binary mode
+# Save pickle in **binary mode** (this is crucial)
 with open("pipe.pkl", "wb") as f:
     pickle.dump(pipe, f)
