@@ -3,37 +3,49 @@ import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.pipeline import Pipeline
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor # Changed from DecisionTree
 import pickle
 
-# Load dataset
-df = pd.read_csv("df.csv")  # Make sure df.csv exists in the same folder
+# 1. Load dataset
+df = pd.read_csv("df.csv") 
 
-# Features and target
-X = df[['Company','TypeName','Ram','Weight','Touchscreen','IPS','PPI',
-        'Cpu_brand','HDD','SSD','Gpu_brand','os']]
-y = df['Price']  # Your target column
+# 2. Features and Target
+X = df[['Company', 'TypeName', 'Ram', 'Weight', 'Touchscreen', 'IPS', 'PPI',
+        'Cpu_brand', 'HDD', 'SSD', 'Gpu_brand', 'os']]
 
-# Preprocessing pipeline
+# CRITICAL FIX: Log-transform the target variable!
+# Your app.py uses np.exp() on the prediction, which means 
+# the model must be trained on the natural logarithm of the price.
+y = np.log(df['Price']) 
+
+# 3. Preprocessing pipeline
 preprocessor = ColumnTransformer(
     transformers=[
-        ('cat', OneHotEncoder(handle_unknown='ignore'), 
-         ['Company','TypeName','Cpu_brand','Gpu_brand','os']),
-        ('num', StandardScaler(), ['Ram','Weight','Touchscreen','IPS','PPI','HDD','SSD'])
+        # Added sparse_output=False and drop='first' to prevent multicollinearity 
+        ('cat', OneHotEncoder(sparse_output=False, drop='first', handle_unknown='ignore'), 
+         ['Company', 'TypeName', 'Cpu_brand', 'Gpu_brand', 'os']),
+        
+        ('num', StandardScaler(), 
+         ['Ram', 'Weight', 'Touchscreen', 'IPS', 'PPI', 'HDD', 'SSD'])
     ]
 )
 
-# Full pipeline
+# 4. Full pipeline with a better model
+# Decision Trees overfit easily. Random Forest handles tabular data much better.
 pipe = Pipeline([
     ('preprocessor', preprocessor),
-    ('model', DecisionTreeRegressor())
+    ('model', RandomForestRegressor(n_estimators=100, random_state=42, max_depth=15)) 
 ])
 
-# Fit pipeline
+# 5. Fit pipeline
+print("⏳ Training model... This might take a few seconds.")
 pipe.fit(X, y)
 
-# Save pipeline as pickle (binary mode!)
+# 6. Save pipeline as pickle
 with open("pipe.pkl", "wb") as f:
+    pickle.dump(pipe, f)
+
+print("✅ Fresh pipe.pkl with Random Forest created successfully!")
     pickle.dump(pipe, f)
 
 print("✅ Fresh pipe.pkl created successfully!")
