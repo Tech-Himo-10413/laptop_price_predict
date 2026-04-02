@@ -1,3 +1,4 @@
+pip install scikit-learn==0.24.2
 import streamlit as st
 import pickle
 import numpy as np
