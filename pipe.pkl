@@ -1,4 +1,3 @@
-# generate_pipe.py
 import pandas as pd
 import numpy as np
 from sklearn.compose import ColumnTransformer
@@ -7,21 +6,15 @@ from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeRegressor
 import pickle
 
-# ------------------------------
 # Load dataset
-# ------------------------------
-df = pd.read_csv("df.csv")  # Make sure df.csv has your training data
+df = pd.read_csv("df.csv")  # Make sure df.csv exists in the same folder
 
-# ------------------------------
 # Features and target
-# ------------------------------
 X = df[['Company','TypeName','Ram','Weight','Touchscreen','IPS','PPI',
         'Cpu_brand','HDD','SSD','Gpu_brand','os']]
-y = df['Price']  # Target column
+y = df['Price']  # Your target column
 
-# ------------------------------
 # Preprocessing pipeline
-# ------------------------------
 preprocessor = ColumnTransformer(
     transformers=[
         ('cat', OneHotEncoder(handle_unknown='ignore'), 
@@ -30,23 +23,17 @@ preprocessor = ColumnTransformer(
     ]
 )
 
-# ------------------------------
 # Full pipeline
-# ------------------------------
 pipe = Pipeline([
     ('preprocessor', preprocessor),
     ('model', DecisionTreeRegressor())
 ])
 
-# ------------------------------
 # Fit pipeline
-# ------------------------------
 pipe.fit(X, y)
 
-# ------------------------------
-# Save the pipeline as a pickle
-# ------------------------------
-with open("pipe.pkl", "wb") as f:  # ✅ Binary mode is essential
+# Save pipeline as pickle (binary mode!)
+with open("pipe.pkl", "wb") as f:
     pickle.dump(pipe, f)
 
-print("✅ pipe.pkl created successfully!")
+print("✅ Fresh pipe.pkl created successfully!")
