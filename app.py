@@ -1,3 +1,5 @@
+# Python >= 3.10 recommended
+pip install scikit-learn==1.2.2 pandas==1.5.3 numpy==1.23.5
 # app.py
 import streamlit as st
 import pickle
