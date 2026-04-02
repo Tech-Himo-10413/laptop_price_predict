@@ -1,4 +1,4 @@
-retrain_pipe.py
+# generate_pipe.py
 import pandas as pd
 import numpy as np
 from sklearn.compose import ColumnTransformer
@@ -7,32 +7,46 @@ from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeRegressor
 import pickle
 
+# ------------------------------
 # Load dataset
-df = pd.read_csv("df.csv")
+# ------------------------------
+df = pd.read_csv("df.csv")  # Make sure df.csv has your training data
 
-# Features & target
-X = df[['Company','TypeName','Ram','Weight','Touchscreen','IPS','PPI','Cpu_brand','HDD','SSD','Gpu_brand','os']]
-y = df['Price']  # target column
+# ------------------------------
+# Features and target
+# ------------------------------
+X = df[['Company','TypeName','Ram','Weight','Touchscreen','IPS','PPI',
+        'Cpu_brand','HDD','SSD','Gpu_brand','os']]
+y = df['Price']  # Target column
 
-# Preprocessing
+# ------------------------------
+# Preprocessing pipeline
+# ------------------------------
 preprocessor = ColumnTransformer(
     transformers=[
-        ('cat', OneHotEncoder(handle_unknown='ignore'), ['Company','TypeName','Cpu_brand','Gpu_brand','os']),
+        ('cat', OneHotEncoder(handle_unknown='ignore'), 
+         ['Company','TypeName','Cpu_brand','Gpu_brand','os']),
         ('num', StandardScaler(), ['Ram','Weight','Touchscreen','IPS','PPI','HDD','SSD'])
     ]
 )
 
-# Pipeline
+# ------------------------------
+# Full pipeline
+# ------------------------------
 pipe = Pipeline([
     ('preprocessor', preprocessor),
     ('model', DecisionTreeRegressor())
 ])
 
+# ------------------------------
 # Fit pipeline
+# ------------------------------
 pipe.fit(X, y)
 
-# Save pickle in binary mode
-with open("pipe.pkl", "wb") as f:
+# ------------------------------
+# Save the pipeline as a pickle
+# ------------------------------
+with open("pipe.pkl", "wb") as f:  # ✅ Binary mode is essential
     pickle.dump(pipe, f)
 
-print("✅ pipe.pkl created successfully with scikit-learn 1.2.2!")
+print("✅ pipe.pkl created successfully!")
