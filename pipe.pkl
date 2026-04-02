@@ -30,6 +30,8 @@ pipe = Pipeline([
 # Fit pipeline
 pipe.fit(X, y)
 
-# Save pickle in **binary mode** (this is crucial)
+# Save pickle in binary mode
 with open("pipe.pkl", "wb") as f:
     pickle.dump(pipe, f)
+
+print("✅ pipe.pkl created successfully!")
