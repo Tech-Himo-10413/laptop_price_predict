@@ -1,3 +1,4 @@
+retrain_pipe.py
 import pandas as pd
 import numpy as np
 from sklearn.compose import ColumnTransformer
@@ -11,7 +12,7 @@ df = pd.read_csv("df.csv")
 
 # Features & target
 X = df[['Company','TypeName','Ram','Weight','Touchscreen','IPS','PPI','Cpu_brand','HDD','SSD','Gpu_brand','os']]
-y = df['Price']
+y = df['Price']  # target column
 
 # Preprocessing
 preprocessor = ColumnTransformer(
@@ -34,4 +35,4 @@ pipe.fit(X, y)
 with open("pipe.pkl", "wb") as f:
     pickle.dump(pipe, f)
 
-print("✅ pipe.pkl created successfully!")
+print("✅ pipe.pkl created successfully with scikit-learn 1.2.2!")
